@@ -6,34 +6,26 @@
 
 // open a single window
 var win = Ti.UI.createWindow({
-	backgroundColor:'white'
+    backgroundColor:'white'
 });
-var label = Ti.UI.createLabel();
+var label = Ti.UI.createLabel({
+    text: "open"
+});
 win.add(label);
 win.open();
 
 // TODO: write your module tests here
-var timediapicker = require('com.bf.TiMediaPicker');
-Ti.API.info("module is => " + timediapicker);
+var com_bduyng_timediapicker = require('com.bduyng.timediapicker');
+Ti.API.info("module is => " + com_bduyng_timediapicker);
 
-label.text = timediapicker.example();
+var picker = com_bduyng_timediapicker.createPicker();
 
-Ti.API.info("module exampleProp is => " + timediapicker.exampleProp);
-timediapicker.exampleProp = "This is a test value";
+picker.addEventListener("success", function onSuccess(e) {
+    picker.removeEventListener("success", onSuccess);
+    console.log(e.items.length);
+    console.log(e.items[0].getSize());
+});
 
-if (Ti.Platform.name == "android") {
-	var proxy = timediapicker.createExample({
-		message: "Creating an example Proxy",
-		backgroundColor: "red",
-		width: 100,
-		height: 100,
-		top: 100,
-		left: 150
-	});
-
-	proxy.printMessage("Hello world!");
-	proxy.message = "Hi world!.  It's me again.";
-	proxy.printMessage("Hello world!");
-	win.add(proxy);
-}
-
+label.addEventListener("click", function (e) {
+    picker.show({ acceptMediaType: "image" });
+})

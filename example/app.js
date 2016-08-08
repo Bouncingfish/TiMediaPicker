@@ -15,10 +15,10 @@ win.add(label);
 win.open();
 
 // TODO: write your module tests here
-var com_bduyng_timediapicker = require('com.bduyng.timediapicker');
-Ti.API.info("module is => " + com_bduyng_timediapicker);
+var com_bf_timediapicker = require('com.bf.TiMediaPicker');
+Ti.API.info("module is => " + com_bf_timediapicker);
 
-var picker = com_bduyng_timediapicker.createPicker();
+var picker = com_bf_timediapicker.createPicker();
 
 picker.addEventListener("success", function onSuccess(e) {
     picker.removeEventListener("success", onSuccess);

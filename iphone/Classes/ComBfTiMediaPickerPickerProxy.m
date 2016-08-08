@@ -60,7 +60,7 @@
 
             // present picker
             [[[[TiApp app] controller] topPresentedController] presentViewController:picker
-                                                                            animated:[TiUtils boolValue:animated def:YES]
+                                                                            animated:YES
                                                                           completion:nil];
         });
     }];

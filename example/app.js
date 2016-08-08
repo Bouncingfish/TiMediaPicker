@@ -15,10 +15,10 @@ win.add(label);
 win.open();
 
 // TODO: write your module tests here
-var com_bf_timediapicker = require('com.bf.TiMediaPicker');
-Ti.API.info("module is => " + com_bf_timediapicker);
+var TiMediaPicker = require('com.bf.TiMediaPicker');
+Ti.API.info("module is => " + TiMediaPicker);
 
-var picker = com_bf_timediapicker.createPicker();
+var picker = TiMediaPicker.createPicker();
 
 picker.addEventListener("success", function onSuccess(e) {
     picker.removeEventListener("success", onSuccess);
@@ -28,4 +28,4 @@ picker.addEventListener("success", function onSuccess(e) {
 
 label.addEventListener("click", function (e) {
     picker.show({ acceptMediaType: "image" });
-})
+});

@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.0
+apiversion: 2
+architectures: armv7 arm64 i386 x86_64
+description: TiMediaPicker
+author: Your Name
+license: Specify your license
+copyright: Copyright (c) 2016 by Your Company
+
+# these should not be edited
+name: TiMediaPicker
+moduleid: com.bf.TiMediaPicker
+guid: 5b10e043-7639-44f3-a0fa-c09109ec98bd
+platform: iphone
+minsdk: 5.3.0.GA

@@ -106,6 +106,8 @@
 		E1AD99531D588DAA001D983F /* PureLayout+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = E1AD994A1D588DAA001D983F /* PureLayout+Internal.h */; };
 		E1AD99541D588DAA001D983F /* PureLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = E1AD994B1D588DAA001D983F /* PureLayout.h */; };
 		E1AD99551D588DAA001D983F /* PureLayoutDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = E1AD994C1D588DAA001D983F /* PureLayoutDefines.h */; };
+		E1AD99581D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = E1AD99561D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.h */; };
+		E1AD99591D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = E1AD99571D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -205,6 +207,8 @@
 		E1AD994A1D588DAA001D983F /* PureLayout+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PureLayout+Internal.h"; sourceTree = "<group>"; };
 		E1AD994B1D588DAA001D983F /* PureLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PureLayout.h; sourceTree = "<group>"; };
 		E1AD994C1D588DAA001D983F /* PureLayoutDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PureLayoutDefines.h; sourceTree = "<group>"; };
+		E1AD99561D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ComBfTiMediaPickerPickerProxy.h; path = Classes/ComBfTiMediaPickerPickerProxy.h; sourceTree = "<group>"; };
+		E1AD99571D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ComBfTiMediaPickerPickerProxy.m; path = Classes/ComBfTiMediaPickerPickerProxy.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -255,6 +259,8 @@
 				24DE9E1011C5FE74003F90F6 /* ComBfTiMediaPickerModuleAssets.m */,
 				24DD6CF71134B3F500162E58 /* ComBfTiMediaPickerModule.h */,
 				24DD6CF81134B3F500162E58 /* ComBfTiMediaPickerModule.m */,
+				E1AD99561D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.h */,
+				E1AD99571D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -388,6 +394,7 @@
 				E1AD98FE1D588D87001D983F /* CTAssetsPageViewController+Internal.h in Headers */,
 				E1AD98FF1D588D87001D983F /* CTAssetsPickerController+Internal.h in Headers */,
 				E1AD99541D588DAA001D983F /* PureLayout.h in Headers */,
+				E1AD99581D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.h in Headers */,
 				E1AD99281D588D87001D983F /* CTAssetsGridViewController.h in Headers */,
 				E1AD991C1D588D87001D983F /* CTAssetScrollView.h in Headers */,
 				E1AD991A1D588D87001D983F /* CTAssetPlayButton.h in Headers */,
@@ -507,6 +514,7 @@
 				E1AD992B1D588D87001D983F /* CTAssetsGridViewFooter.m in Sources */,
 				E1AD99401D588D87001D983F /* CTAssetThumbnailStacks.m in Sources */,
 				E1AD99521D588DAA001D983F /* NSLayoutConstraint+PureLayout.m in Sources */,
+				E1AD99591D5890B5001D983F /* ComBfTiMediaPickerPickerProxy.m in Sources */,
 				E1AD99111D588D87001D983F /* UIImage+CTAssetsPickerController.m in Sources */,
 				E1AD99171D588D87001D983F /* CTAssetCollectionViewController.m in Sources */,
 				E1AD990B1D588D87001D983F /* PHAssetCollection+CTAssetsPickerController.m in Sources */,

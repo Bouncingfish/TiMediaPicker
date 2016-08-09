@@ -27,5 +27,8 @@ picker.addEventListener("success", function onSuccess(e) {
 });
 
 label.addEventListener("click", function (e) {
-    picker.show({ acceptMediaType: "image" });
+    picker.show({
+        animated: true,
+        acceptMediaType: "image" // or "video" - "" or no set mean "both"
+    });
 });

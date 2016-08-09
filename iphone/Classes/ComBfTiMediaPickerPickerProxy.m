@@ -14,43 +14,29 @@
 
 -(void)show:(id)args
 {
-    // id animated = [args valueForKey:@"animated"];
-    // ENSURE_TYPE_OR_NIL(animated, NSNumber);
-
-    // id acceptMediaType = [args valueForKey:@"acceptMediaType"];
-    // ENSURE_TYPE_OR_NIL(acceptMediaType, NSString);
+    ENSURE_SINGLE_ARG_OR_NIL(args, NSDictionary);
+    BOOL animated = [TiUtils boolValue:@"animated" properties:args def:YES];
+    NSString *acceptMediaType = [TiUtils stringValue:@"acceptMediaType" properties:args def:@""];
 
     CTAssetsPickerController *picker = [[CTAssetsPickerController alloc] init];
 
-    // set accept medie type
-    // FIXME: only accept image now
-    PHFetchOptions *fetchOptions = [PHFetchOptions new];
-    fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
-    picker.assetsFetchOptions = fetchOptions;
-    //
-    // TODO: should support array, all as default
-    // if ([acceptMediaType isEqual: @"image"]) {
-    //     PHFetchOptions *fetchOptions = [PHFetchOptions new];
-    //     fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
-    //     picker.assetsFetchOptions = fetchOptions;
-    // }
-    // else if ([acceptMediaType isEqual: @"video"]) {
-    //     PHFetchOptions *fetchOptions = [PHFetchOptions new];
-    //     fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeVideo];
-    //     picker.assetsFetchOptions = fetchOptions;
-    // }
-    // else if ([acceptMediaType isEqual: @"audio"]) {
-    //     PHFetchOptions *fetchOptions = [PHFetchOptions new];
-    //     fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeAudio];
-    //     picker.assetsFetchOptions = fetchOptions;
-    // }
+    // set accept media types
+    if (![acceptMediaType  isEqual: @""]) {
+        if ([acceptMediaType  isEqual: @"image"]) {
+            PHFetchOptions *fetchOptions = [PHFetchOptions new];
+            fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
+            picker.assetsFetchOptions = fetchOptions;
+        }
+        else if ([acceptMediaType  isEqual: @"video"]) {
+            PHFetchOptions *fetchOptions = [PHFetchOptions new];
+            fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeVideo];
+            picker.assetsFetchOptions = fetchOptions;
+        }
+    }
 
     // request authorization status
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status){
         dispatch_async(dispatch_get_main_queue(), ^{
-            // init picker
-            // CTAssetsPickerController *pickerDialog = [[CTAssetsPickerController alloc] init];
-
             // set delegate
             picker.delegate = self;
 
@@ -60,7 +46,7 @@
 
             // present picker
             [[[[TiApp app] controller] topPresentedController] presentViewController:picker
-                                                                            animated:YES
+                                                                            animated:animated
                                                                           completion:nil];
         });
     }];
@@ -94,11 +80,14 @@
     // TODO: should not reset progress every image
     requestOptions.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"imagesCount: %d", imagesCount);
+            NSLog(@"last progress: %f", (float)(imagesCount / [assets count]));
+            NSLog(@"real progress: %f", progress);
             [progressView setProgress: progress];
         });
     };
-
-    // Retrive all  images
+    
+    // Retrive all images
     for (PHAsset *asset in assets) {
         [manager requestImageForAsset:asset
             targetSize:PHImageManagerMaximumSize

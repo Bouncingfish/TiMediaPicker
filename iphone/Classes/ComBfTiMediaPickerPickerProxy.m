@@ -76,14 +76,10 @@
     PHImageManager *manager = [PHImageManager defaultManager];
     NSMutableArray *blobs = [NSMutableArray arrayWithCapacity:[assets count]];
     __block NSUInteger imagesCount = 0;
-
-    // TODO: should not reset progress every image
+    
     requestOptions.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"imagesCount: %d", imagesCount);
-            NSLog(@"last progress: %f", (float)(imagesCount / [assets count]));
-            NSLog(@"real progress: %f", progress);
-            [progressView setProgress: progress];
+            [progressView setProgress: ((float)imagesCount + progress) / [assets count] ];
         });
     };
     

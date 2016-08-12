@@ -76,13 +76,13 @@
     PHImageManager *manager = [PHImageManager defaultManager];
     NSMutableArray *blobs = [NSMutableArray arrayWithCapacity:[assets count]];
     __block NSUInteger imagesCount = 0;
-    
+
     requestOptions.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [progressView setProgress: ((float)imagesCount + progress) / [assets count] ];
         });
     };
-    
+
     // Retrive all images
     for (PHAsset *asset in assets) {
         [manager requestImageForAsset:asset
@@ -115,6 +115,25 @@
                 else {
                     if ([self _hasListeners:@"error"]) {
                         [self fireEvent:@"error"];
+                        [picker dismissViewControllerAnimated:YES completion:nil];
+                    }
+                    else {
+                        UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                                       message:@"An error occurred while fetching data. Please check your connection and try again."
+                                                                                preferredStyle:UIAlertControllerStyleAlert];
+                        
+                        UIAlertAction* defaultAction = [UIAlertAction
+                            actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                            handler:^(UIAlertAction * action) {
+                                [picker dismissViewControllerAnimated:YES completion:nil];
+                            }
+                        ];
+                        
+                        [alert addAction:defaultAction];
+                        
+                        [[[[TiApp app] controller] topPresentedController] presentViewController:alert
+                                                                                        animated:YES
+                                                                                      completion:nil];
                     }
                 }
             }

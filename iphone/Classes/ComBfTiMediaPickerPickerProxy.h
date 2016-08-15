@@ -9,7 +9,9 @@
 #import "TiProxy.h"
 #import "CTAssetsPickerController.h"
 
-@interface ComBfTiMediaPickerPickerProxy : TiProxy <CTAssetsPickerControllerDelegate>
+@interface ComBfTiMediaPickerPickerProxy : TiProxy <CTAssetsPickerControllerDelegate> {
+    NSUInteger maxSelectableMedia;
+}
 
 -(void)show:(id)args;
 

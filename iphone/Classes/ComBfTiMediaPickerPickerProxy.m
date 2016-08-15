@@ -17,6 +17,7 @@
     ENSURE_SINGLE_ARG_OR_NIL(args, NSDictionary);
     BOOL animated = [TiUtils boolValue:@"animated" properties:args def:YES];
     NSString *acceptMediaType = [TiUtils stringValue:@"acceptMediaType" properties:args def:@""];
+    maxSelectableMedia = [TiUtils intValue:@"maxSelectableMedia" properties:args def:-1];
 
     CTAssetsPickerController *picker = [[CTAssetsPickerController alloc] init];
 
@@ -103,6 +104,7 @@
                         NSLog(@"Get all");
                         if (picker != nil) {
                             [picker dismissViewControllerAnimated:YES completion:^{
+                                maxSelectableMedia = -1;
                                 if ([self _hasListeners:@"success"]) {
                                     NSMutableDictionary *reponseObject = [[NSMutableDictionary alloc] init];
                                     [reponseObject setObject:blobs forKey:@"items"];
@@ -115,7 +117,9 @@
                 else {
                     if ([self _hasListeners:@"error"]) {
                         [self fireEvent:@"error"];
-                        [picker dismissViewControllerAnimated:YES completion:nil];
+                        [picker dismissViewControllerAnimated:YES completion:^{
+                            maxSelectableMedia = -1;
+                        }];
                     }
                     else {
                         UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
@@ -125,7 +129,9 @@
                         UIAlertAction* defaultAction = [UIAlertAction
                             actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                             handler:^(UIAlertAction * action) {
-                                [picker dismissViewControllerAnimated:YES completion:nil];
+                                [picker dismissViewControllerAnimated:YES completion:^{
+                                    maxSelectableMedia = -1;
+                                }];
                             }
                         ];
                         
@@ -139,6 +145,33 @@
             }
         ];
     }
+}
+
+// implement should select asset delegate
+- (BOOL)assetsPickerController:(CTAssetsPickerController *)picker shouldSelectAsset:(PHAsset *)asset
+{
+    if (maxSelectableMedia == -1) return true;
+    
+    // show alert gracefully
+    if (picker.selectedAssets.count >= maxSelectableMedia)
+    {
+        UIAlertController *alert =
+        [UIAlertController alertControllerWithTitle:@"Attention"
+                                            message:[NSString stringWithFormat:@"Please select not more than %ld assets", (long)maxSelectableMedia]
+                                     preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction *action =
+        [UIAlertAction actionWithTitle:@"OK"
+                                 style:UIAlertActionStyleDefault
+                               handler:nil];
+        
+        [alert addAction:action];
+        
+        [picker presentViewController:alert animated:YES completion:nil];
+    }
+    
+    // limit selection to max
+    return (picker.selectedAssets.count < maxSelectableMedia);
 }
 
 @end

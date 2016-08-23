@@ -37,12 +37,19 @@ picker.addEventListener("success", function onSuccess(e) {
         });
         win.add(videoPlayer);
     }
+    else if (e.items[0].getMimeType().indexOf("image") !== -1) {
+        var imageView = Titanium.UI.createImageView({
+            width : 300,
+            image: e.items[0]
+        });
+        win.add(imageView);
+    }
 });
 
 label.addEventListener("click", function (e) {
     picker.show({
         animated: true,
-        acceptMediaType: "video", // or "video" - "" or no set mean "both",
+        acceptMediaType: "video", // or "image" - "" or no set mean "both",
         maxSelectableMedia: 2 // -1 is no limit
     });
 });

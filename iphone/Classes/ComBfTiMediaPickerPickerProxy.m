@@ -53,10 +53,109 @@
     }];
 }
 
-- (void)assetsPickerController:(CTAssetsPickerController *)picker didFinishPickingAssets:(NSArray *)assets
+- (void)fetchVideos:(CTAssetsPickerController *)picker didFinishPickingAssets:(NSArray *)assets
 {
-    NSLog(@"assetsCount: %d", [assets count]);
+    // assets contains PHAsset objects.
+    PHVideoRequestOptions *requestOptions = [[PHVideoRequestOptions alloc] init];
+    requestOptions.version = PHVideoRequestOptionsVersionOriginal;
+    requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    requestOptions.networkAccessAllowed = YES; // able to download iCloud images
 
+    // progress view background
+    UIView *progressViewBackground = [[UIView alloc] initWithFrame:picker.view.frame];
+    progressViewBackground.backgroundColor = [[UIColor alloc] initWithRed:0.0 green:0.0 blue:0.0 alpha:0.7];
+    [picker.view addSubview:progressViewBackground];
+
+    UIProgressView *progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    progressView.center = picker.view.center;
+    [picker.view addSubview:progressView];
+
+    PHImageManager *manager = [PHImageManager defaultManager];
+    NSMutableArray *blobs = [NSMutableArray arrayWithCapacity:[assets count]];
+    __block NSUInteger videosCount = 0;
+
+    requestOptions.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [progressView setProgress: ((float)videosCount + progress) / [assets count] ];
+        });
+    };
+
+    // Retrive all images
+    for (PHAsset *asset in assets) {
+        [manager
+            requestAVAssetForVideo:asset
+            options:requestOptions
+            resultHandler:^void(AVAsset *video, AVAudioMix *audioMix, NSDictionary *info) {
+                NSLog(@"%@", video.metadata);
+                NSString *fileName = @"video";
+                NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+                __block NSData *videoData = nil;
+
+                AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:video presetName:AVAssetExportPresetHighestQuality];
+                exportSession.outputURL = fileURL;
+                exportSession.outputFileType = AVFileTypeQuickTimeMovie;
+                [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                    videoData = [NSData dataWithContentsOfURL:fileURL];
+                    NSLog(@"Size of current video(bytes): %d",[videoData length]);
+
+                    if ([videoData length] != 0) {
+                        TiBlob *blob = [[TiBlob alloc] initWithData:videoData mimetype:@"video/quicktime"];
+                        [blobs addObject:blob];
+                        videosCount++;
+                        [progressView setProgress:videosCount / [assets count]];
+
+                        if (videosCount == [assets count]) {
+                            NSLog(@"Get all");
+                            if (picker != nil) {
+                                [picker dismissViewControllerAnimated:YES completion:^{
+                                    maxSelectableMedia = -1;
+                                    if ([self _hasListeners:@"success"]) {
+                                        NSMutableDictionary *reponseObject = [[NSMutableDictionary alloc] init];
+                                        [reponseObject setObject:blobs forKey:@"items"];
+                                        [self fireEvent:@"success" withObject:reponseObject];
+                                    }
+                                }];
+                            }
+                        }
+                    }
+                    else {
+                        if ([self _hasListeners:@"error"]) {
+                            [self fireEvent:@"error"];
+                            [picker dismissViewControllerAnimated:YES completion:^{
+                                maxSelectableMedia = -1;
+                            }];
+                        }
+                        else {
+                            UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
+                                                                                           message:@"An error occurred while fetching data. Please check your connection and try again."
+                                                                                    preferredStyle:UIAlertControllerStyleAlert];
+
+                            UIAlertAction* defaultAction = [UIAlertAction
+                                                            actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction * action) {
+                                                                [picker dismissViewControllerAnimated:YES completion:^{
+                                                                    maxSelectableMedia = -1;
+                                                                }];
+                                                            }
+                                                            ];
+
+                            [alert addAction:defaultAction];
+
+                            [[[[TiApp app] controller] topPresentedController] presentViewController:alert
+                                                                                            animated:YES
+                                                                                          completion:nil];
+                        }
+                    }
+                }];
+
+
+            }
+        ];
+    }
+}
+
+- (void)fetchImages:(CTAssetsPickerController *)picker didFinishPickingAssets:(NSArray *)assets
+{
     // assets contains PHAsset objects.
     PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
     requestOptions.resizeMode   = PHImageRequestOptionsResizeModeExact;
@@ -123,9 +222,9 @@
                     }
                     else {
                         UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Error"
-                                                                                       message:@"An error occurred while fetching data. Please check your connection and try again."
-                                                                                preferredStyle:UIAlertControllerStyleAlert];
-                        
+                            message:@"An error occurred while fetching data. Please check your connection and try again."
+                            preferredStyle:UIAlertControllerStyleAlert];
+
                         UIAlertAction* defaultAction = [UIAlertAction
                             actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                             handler:^(UIAlertAction * action) {
@@ -133,13 +232,13 @@
                                     maxSelectableMedia = -1;
                                 }];
                             }
-                        ];
-                        
+                            ];
+
                         [alert addAction:defaultAction];
-                        
+
                         [[[[TiApp app] controller] topPresentedController] presentViewController:alert
-                                                                                        animated:YES
-                                                                                      completion:nil];
+                            animated:YES
+                            completion:nil];
                     }
                 }
             }
@@ -147,11 +246,22 @@
     }
 }
 
+- (void)assetsPickerController:(CTAssetsPickerController *)picker didFinishPickingAssets:(NSArray *)assets
+{
+    NSLog(@"assetsCount: %d", [assets count]);
+    if ([picker.assetsFetchOptions.predicate.predicateFormat isEqual:@"mediaType == 2"]) { // videos
+        [self fetchVideos:picker didFinishPickingAssets:assets];
+    }
+    else if ([picker.assetsFetchOptions.predicate.predicateFormat isEqual:@"mediaType == 1"]) { // images
+        [self fetchImages:picker didFinishPickingAssets:assets];
+    }
+}
+
 // implement should select asset delegate
 - (BOOL)assetsPickerController:(CTAssetsPickerController *)picker shouldSelectAsset:(PHAsset *)asset
 {
     if (maxSelectableMedia == -1) return true;
-    
+
     // show alert gracefully
     if (picker.selectedAssets.count >= maxSelectableMedia)
     {
@@ -159,17 +269,17 @@
         [UIAlertController alertControllerWithTitle:@"Attention"
                                             message:[NSString stringWithFormat:@"Please select not more than %ld assets", (long)maxSelectableMedia]
                                      preferredStyle:UIAlertControllerStyleAlert];
-        
+
         UIAlertAction *action =
         [UIAlertAction actionWithTitle:@"OK"
                                  style:UIAlertActionStyleDefault
                                handler:nil];
-        
+
         [alert addAction:action];
-        
+
         [picker presentViewController:alert animated:YES completion:nil];
     }
-    
+
     // limit selection to max
     return (picker.selectedAssets.count < maxSelectableMedia);
 }

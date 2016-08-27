@@ -21,18 +21,14 @@
 
     CTAssetsPickerController *picker = [[CTAssetsPickerController alloc] init];
 
+    PHFetchOptions *fetchOptions = [PHFetchOptions new];
+    fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
+    picker.assetsFetchOptions = fetchOptions;
+
     // set accept media types
-    if (![acceptMediaType  isEqual: @""]) {
-        if ([acceptMediaType  isEqual: @"image"]) {
-            PHFetchOptions *fetchOptions = [PHFetchOptions new];
-            fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage];
-            picker.assetsFetchOptions = fetchOptions;
-        }
-        else if ([acceptMediaType  isEqual: @"video"]) {
-            PHFetchOptions *fetchOptions = [PHFetchOptions new];
-            fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeVideo];
-            picker.assetsFetchOptions = fetchOptions;
-        }
+    if ([acceptMediaType  isEqual: @"video"]) {
+        fetchOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeVideo];
+        picker.assetsFetchOptions = fetchOptions;
     }
 
     // request authorization status
@@ -86,8 +82,12 @@
             requestAVAssetForVideo:asset
             options:requestOptions
             resultHandler:^void(AVAsset *video, AVAudioMix *audioMix, NSDictionary *info) {
-                NSLog(@"%@", video.metadata);
-                NSString *fileName = @"video";
+                NSArray *metadata = [video availableMetadataFormats];
+                for (NSString *format in metadata) {
+                    NSLog(@"%@", format);
+                }
+                NSString *fileName = [NSString stringWithFormat:@"video%d", (int)videosCount];
+                NSLog(@"%@", fileName);
                 NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
                 __block NSData *videoData = nil;
 
@@ -252,7 +252,7 @@
     if ([picker.assetsFetchOptions.predicate.predicateFormat isEqual:@"mediaType == 2"]) { // videos
         [self fetchVideos:picker didFinishPickingAssets:assets];
     }
-    else if ([picker.assetsFetchOptions.predicate.predicateFormat isEqual:@"mediaType == 1"]) { // images
+    else { // images
         [self fetchImages:picker didFinishPickingAssets:assets];
     }
 }

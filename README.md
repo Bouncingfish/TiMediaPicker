@@ -1,6 +1,8 @@
 
 # TiMediaPicker
 
+![Screenshot](https://github.com/Bouncingfish/TiMediaPicker/blob/master/example.gif)
+
 ## Description
 
 Gallery / Media picker for iOS that supports multiple selection
